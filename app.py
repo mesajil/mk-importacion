@@ -1,42 +1,44 @@
 import streamlit as st
-import pandas as pd
-from datetime import datetime
 import zipfile
 import io
+from datetime import datetime
+
+from utils import read_excel_skip_rows, select_columns, dataframe_to_csv_string
 
 st.set_page_config(page_title="XLSX a CSV ZIP", layout="centered")
 
 st.title("📊 Conversor XLSX → CSV (ZIP)")
-st.write("Sube un archivo .xlsx y descarga un ZIP con 4 archivos CSV.")
+st.write("Sube un archivo .xlsx y descarga un ZIP con 4 CSV personalizados.")
 
 uploaded_file = st.file_uploader("Selecciona un archivo Excel (.xlsx)", type=["xlsx"])
 
-if uploaded_file is not None:
+if uploaded_file:
     try:
-        # Leer el archivo Excel (primera hoja)
-        df = pd.read_excel(uploaded_file)
+        # Leer Excel sin las primeras 6 filas
+        df = read_excel_skip_rows(uploaded_file, skip_rows=6)
 
-        # Fecha actual DD-MM-YY
+        # Configuración de columnas por archivo
+        column_sets = {
+            1: [0, 1],  # A, B
+            2: [0, 4, 5],  # A, E, F
+            3: [0, 2],  # A, C
+            4: [0, 3],  # A, D
+        }
+
         today = datetime.now().strftime("%d-%m-%y")
-
-        # Crear ZIP en memoria
         zip_buffer = io.BytesIO()
 
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-            for i in range(1, 5):
+            for i, cols in column_sets.items():
+                filtered_df = select_columns(df, cols)
+                csv_content = dataframe_to_csv_string(filtered_df)
+
                 filename = f"{today}-{i}.csv"
-
-                # Convertir DataFrame a CSV en memoria
-                csv_buffer = io.StringIO()
-                df.to_csv(csv_buffer, index=False, sep=",")
-                csv_content = csv_buffer.getvalue()
-
-                # Agregar al ZIP
                 zip_file.writestr(filename, csv_content)
 
         zip_buffer.seek(0)
 
-        st.success("✅ Conversión completada")
+        st.success("✅ Archivos generados correctamente")
 
         st.download_button(
             label="⬇️ Descargar ZIP",
@@ -46,4 +48,4 @@ if uploaded_file is not None:
         )
 
     except Exception as e:
-        st.error(f"❌ Error procesando el archivo: {e}")
+        st.error(f"❌ Error: {e}")
