@@ -1,5 +1,6 @@
 import pandas as pd
 import io
+from decimal import Decimal, ROUND_HALF_UP
 
 
 def read_excel_skip_rows(file, skip_rows=6):
@@ -37,6 +38,11 @@ def dataframe_to_csv_string(df, delimiter=";"):
     return buffer.getvalue()
 
 
+def round_2_decimals(value):
+    """Redondea un valor a 2 decimales usando ROUND_HALF_UP."""
+    return str(Decimal(value).quantize(Decimal("0.00"), rounding=ROUND_HALF_UP))
+
+
 def normalize_columns(df, original_indexes):
     """
     Normaliza las columnas según reglas A–F.
@@ -66,7 +72,7 @@ def normalize_columns(df, original_indexes):
             df.iloc[:, pos] = (
                 col.astype(str)
                 .str.replace(",", "", regex=False)
-                .apply(lambda x: f"{float(x):.2f}" if x != "" else "")
+                .apply(lambda x: round_2_decimals(x) if x != "" else "")
             )
 
         # Columnas E y F: 3 decimales
