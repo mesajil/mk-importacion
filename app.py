@@ -49,3 +49,6 @@ if uploaded_file:
 
     except Exception as e:
         st.error(f"❌ Error: {e}")
+
+st.divider()
+st.caption("Versión 1.2 · Conversor XLSX → CSV")
