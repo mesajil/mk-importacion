@@ -52,4 +52,4 @@ if uploaded_file:
         st.error(f"❌ Error: {e}")
 
 st.divider()
-st.caption("Versión 1.3 · Conversor XLSX → CSV")
+st.caption("Versión 1.4 · Conversor XLSX → CSV")
