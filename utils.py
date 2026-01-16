@@ -35,7 +35,7 @@ def dataframe_to_csv_string(df, delimiter=";"):
     """
     buffer = io.StringIO()
     df.to_csv(buffer, index=False, header=False, sep=delimiter)
-    return buffer.getvalue().encode("utf-8")
+    return ("\ufeff" + buffer.getvalue()).encode("utf-8")
 
 
 def round_2_decimals(value):
