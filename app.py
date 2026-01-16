@@ -26,7 +26,8 @@ if uploaded_file:
             4: [0, 3],  # A, D
         }
 
-        today = datetime.now().strftime("%d-%m-%y")
+        # today = datetime.now().strftime("%d-%m-%y") # Ya no se usa la fecha para el nombre de los archivos generados
+        base_name = os.path.splitext(uploaded_file.name)[0]
         zip_buffer = io.BytesIO()
 
         with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
@@ -37,13 +38,13 @@ if uploaded_file:
 
                 csv_content = dataframe_to_csv_string(normalize_df, delimiter=";")
 
-                zip_file.writestr(f"{today}-{i}.csv", csv_content)
+                zip_file.writestr(f"{base_name}{i}.csv", csv_content)
 
         zip_buffer.seek(0)
 
         st.success("✅ Archivos generados correctamente")
         st.download_button(
-            "⬇️ Descargar ZIP", zip_buffer, f"{today}-csvs.zip", "application/zip"
+            "⬇️ Descargar ZIP", zip_buffer, f"{base_name}.zip", "application/zip"
         )
 
     except Exception as e:
