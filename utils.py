@@ -53,8 +53,6 @@ def normalize_columns(df, original_indexes):
     for pos, original_idx in enumerate(original_indexes):
         col = df.iloc[:, pos]
 
-        print(col)
-
         # Columna A: texto de 6 dígitos
         if original_idx == 0:
             df.iloc[:, pos] = col.astype(str).str.zfill(6)
